@@ -43,7 +43,7 @@ function! dispatch#tmux#make(request) abort
   let title = shellescape(get(a:request, 'title', get(a:request, 'compiler', 'make')))
   if get(a:request, 'background', 0)
     let cmd = 'new-window -d -n '.title
-  elseif has('gui_running') || empty($TMUX) || (!empty(''.session) && session !=# system('tmux display-message -p "#S"')[0:-2])
+  elseif (has('gui_running') && !has('nvim')) || empty($TMUX) || (!empty(''.session) && session !=# system('tmux display-message -p "#S"')[0:-2])
     let cmd = 'new-window -n '.title
   else
     let cmd = 'split-window -l 10 -d'
@@ -112,5 +112,5 @@ endfunction
 
 augroup dispatch_tmux
   autocmd!
-  autocmd VimResized * nested if !has('gui_running') | call dispatch#tmux#poll() | endif
+  autocmd VimResized * nested if !has('gui_running') || has('nvim') | call dispatch#tmux#poll() | endif
 augroup END
